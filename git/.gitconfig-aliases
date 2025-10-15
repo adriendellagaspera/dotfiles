@@ -1,0 +1,22 @@
+[alias]
+	# List local branches whose remote has been deleted
+	list-gone = !git branch -vv | grep \": gone]\"
+
+	# Delete all local branches whose remote has been deleted
+	prune-gone = !git branch -vv | grep \": gone]\" | awk \"{print \\$1}\" | xargs -r -n 1 git branch -D
+
+	# Pretty log
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+
+	# Show branches sorted by last modified
+	recent = branch --sort=-committerdate --format='%(committerdate:relative)%09%(refname:short)'
+
+	# Undo last commit but keep changes
+	undo = reset --soft HEAD^
+
+	# Show what was changed in last commit
+	last = log -1 HEAD --stat
+
+	# Amend last commit without changing message
+	amend = commit --amend --no-edit
+
