@@ -1,0 +1,4 @@
+# GitHub slug per line. Lines starting with # are ignored.
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-syntax-highlighting
+zsh-users/zsh-completions

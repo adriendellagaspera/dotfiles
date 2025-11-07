@@ -76,6 +76,59 @@ configure_delta() {
     fi
 }
 
+sync_zsh_plugins() {
+    local list_file="$1"
+    local plugins_dir="${XDG_DATA_HOME:-$HOME/.local/share}/zsh/plugins"
+    mkdir -p "$plugins_dir"
+
+    while IFS= read -r slug; do
+        [[ -z "$slug" || "$slug" == \#* ]] && continue
+
+        local name="${slug##*/}"
+        local dest="${plugins_dir}/${name}"
+
+        if [ -d "$dest/.git" ]; then
+            if git -C "$dest" pull --ff-only --quiet; then
+                log "Updated ${slug}"
+            else
+                log "Warning: failed to update ${slug} (leave existing copy as-is)"
+            fi
+        else
+            if git clone --depth 1 "https://github.com/${slug}.git" "$dest" >/dev/null 2>&1; then
+                log "Cloned ${slug}"
+            else
+                log "Warning: failed to clone ${slug} (will retry next install)"
+            fi
+        fi
+    done <"$list_file"
+}
+
+setup_zsh() {
+    local repo_root="$1"
+    local zsh_root="${repo_root}/zsh"
+
+    if [ ! -d "$zsh_root" ]; then
+        log "No zsh directory found; skipping shell setup"
+        return
+    fi
+
+    local zdotdir="${XDG_CONFIG_HOME:-$HOME/.config}/zsh"
+
+    link_file "${zsh_root}/.zshenv" "$HOME/.zshenv"
+    link_file "${zsh_root}/config" "$zdotdir"
+
+    local plugin_list="${zsh_root}/config/plugins.list"
+    if [ -f "$plugin_list" ]; then
+        if [ "${DOTFILES_SKIP_ZSH_PLUGINS:-0}" != "0" ]; then
+            log "DOTFILES_SKIP_ZSH_PLUGINS set; skipping plugin sync"
+        elif ! command -v zsh >/dev/null 2>&1; then
+            log "zsh not found; skipping plugin sync"
+        else
+            sync_zsh_plugins "$plugin_list"
+        fi
+    fi
+}
+
 main() {
     require_command git
 
@@ -94,6 +147,8 @@ main() {
 
     link_file "$git_ignore" "$HOME/.gitignore_global"
     link_file "$git_message" "$HOME/.gitmessage"
+
+    setup_zsh "$repo_root"
 
     log "Dotfiles installation complete"
     log "Update your name/email in ${git_config} if needed"

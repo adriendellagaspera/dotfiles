@@ -9,6 +9,7 @@ Portable Git-first dotfiles so your workflow feels the same on any machine (loca
 - Opinionated global ignore file plus a commit message template that are symlinked into `$HOME` so edits follow the repo.
 - Optional include that lights up [delta](https://github.com/dandavison/delta) as the pager whenever it is available (and automatically removed when it is not).
 - Idempotent installer that works from any checkout path, backs up existing dotfiles, and keeps your global Git config tidy.
+- First-class zsh setup with XDG-friendly layout (`~/.zshenv` + `~/.config/zsh`), ergonomic defaults (history, completion, prompt, aliases), and optional plugins (autosuggestions, syntax highlighting, completions, fzf) that auto-sync into `~/.local/share/zsh/plugins`.
 
 ## Installation
 
@@ -21,7 +22,9 @@ The script:
 1. Detects the repository path automatically, so you can run it from any clone (even inside containers).
 2. Adds the Git include(s) only once and keeps them up to date.
 3. Symlinks `git/.gitignore_global` → `~/.gitignore_global` and `git/.gitmessage` → `~/.gitmessage`, backing up any existing files as `*.backup.<timestamp>`.
-4. Enables the delta config when `delta` is installed, and removes it when it is missing so `git diff` never breaks.
+4. Links `zsh/.zshenv` → `~/.zshenv` and `zsh/config` → `~/.config/zsh`, keeping everything XDG-aligned.
+5. Enables the delta config when `delta` is installed, and removes it when it is missing so `git diff` never breaks.
+6. Optionally clones/updates the zsh plugins defined in `zsh/config/plugins.list` whenever `zsh` is present (set `DOTFILES_SKIP_ZSH_PLUGINS=1` to opt out—handy on restricted networks).
 
 Re-run the installer any time—you can keep tweaking the repo and immediately sync the changes onto the host/container.
 
@@ -30,6 +33,17 @@ Re-run the installer any time—you can keep tweaking the repo and immediately s
 1. Edit `git/.gitconfig` and set your `user.name` / `user.email` (the defaults are placeholders).
 2. Adjust the global ignore or commit template to match team conventions; because the files are symlinked into `$HOME`, all editors use the repo version.
 3. Install [`delta`](https://github.com/dandavison/delta) if you want side-by-side diffs; otherwise the standard pager is left untouched.
+4. Customize the zsh stack by editing files under `zsh/config/` (e.g., extend `aliases.zsh`, tweak `prompt.zsh`, or change the plugin list). You can also drop `.zsh` snippets into `~/.config/zsh/local/` for machine-specific overrides that stay out of git.
+
+## Zsh highlights
+
+- `.zshenv` keeps `$ZDOTDIR` and `$DOTFILES_ROOT` consistent everywhere (interactive shells, scripts, login shells).
+- `~/.config/zsh/.zshrc` sources modular files for path/env setup, shell options, completions, aliases, prompt, and plugins.
+- History lives under `${XDG_STATE_HOME:-~/.local/state}/zsh/history`, giving you 200k entries with `history-beginning-search` keybindings.
+- Prompt built on `vcs_info` shows branch, staged/unstaged markers, exit status, and a right-aligned clock.
+- Plugin manager keeps repositories under `${XDG_DATA_HOME:-~/.local/share}/zsh/plugins`; edit `zsh/config/plugins.list` to add/remove entries, then rerun `./install.sh` to sync.
+- If you are offline or behind a restrictive network policy, export `DOTFILES_SKIP_ZSH_PLUGINS=1` before running the installer to quiet plugin-clone warnings. Re-run without the flag once you regain access.
+- fzf integration auto-loads when `fzf` is installed (via the stock `~/.fzf.zsh` script), and autosuggestions gain a `<Ctrl-Space>` accept binding.
 
 ## Git aliases snapshot
 
@@ -52,6 +66,9 @@ dotfiles/
 │   ├── .gitconfig.delta      # Optional delta-specific tuning
 │   ├── .gitignore_global     # Global ignore patterns
 │   └── .gitmessage           # Conventional commits template
+├── zsh/
+│   ├── .zshenv               # Sets DOTFILES + XDG-aware ZDOTDIR
+│   └── config/               # Modular zsh config (rc, aliases, prompt, plugins)
 ├── install.sh                # Idempotent installer / bootstrapper
 └── README.md                 # This file
 ```
