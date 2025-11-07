@@ -1,0 +1,17 @@
+# <type>(scope): short summary
+#
+# Body:
+# - Wrap at 72 chars
+# - Explain what and why, not how
+#
+# Footer:
+# - BREAKING CHANGE: describe
+# - Closes #123
+
+<type>(scope): short summary
+
+Explain the change in a sentence or two.
+
+Additional context or bullet list if needed.
+
+Refs: #

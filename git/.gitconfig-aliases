@@ -1,22 +1,31 @@
 [alias]
-	# List local branches whose remote has been deleted
-	list-gone = !git branch -vv | grep \": gone]\"
-
-	# Delete all local branches whose remote has been deleted
-	prune-gone = !git branch -vv | grep \": gone]\" | awk \"{print \\$1}\" | xargs -r -n 1 git branch -D
-
-	# Pretty log
-	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-
-	# Show branches sorted by last modified
+	# --- Branch hygiene ----------------------------------------------------
+	list-gone = "!git branch -vv | grep ': gone]'"
+	prune-gone = "!git branch -vv | grep ': gone]' | awk '{print $1}' | xargs -r -n 1 git branch -D"
+	prune-merged = "!git branch --merged | egrep -v '(^\\*|main|master|develop)' | xargs -r git branch -d"
 	recent = branch --sort=-committerdate --format='%(committerdate:relative)%09%(refname:short)'
 
-	# Undo last commit but keep changes
-	undo = reset --soft HEAD^
-
-	# Show what was changed in last commit
+	# --- History views -----------------------------------------------------
+	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+	lga = log --graph --all --decorate --stat
+	ll = log --oneline -n 20
 	last = log -1 HEAD --stat
+	files = diff --name-only --diff-filter=ACMRTUXB
 
-	# Amend last commit without changing message
+	# --- Workflow helpers --------------------------------------------------
+	undo = reset --soft HEAD^
+	uncommit = reset --mixed HEAD^
+	unstage = reset HEAD --
+	staged = diff --staged
 	amend = commit --amend --no-edit
+	fixup = commit --fixup HEAD
+	continue = rebase --continue
+	wip = "!f() { git add -A && git commit -m 'WIP' --no-verify; }; f"
+	please = push --force-with-lease
 
+	# --- Inspection --------------------------------------------------------
+	coauthors = "!f() { printf '\nCo-authored-by: %s <%s>\n' \"${1:?name}\" \"${2:?email}\" >> .git/COMMIT_EDITMSG; }; f"
+	root = rev-parse --show-toplevel
+	blame = blame -w -C -C
+	tags = tag -l --sort=-taggerdate
+	shortstat = diff --shortstat "@{1}" HEAD

@@ -1,40 +1,102 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Dotfiles installation script
-# This script sets up Git configuration
+set -euo pipefail
 
-set -e
+log() {
+    printf '[dotfiles] %s\n' "$*"
+}
 
-DOTFILES_DIR="$HOME/dotfiles"
+require_command() {
+    if ! command -v "$1" >/dev/null 2>&1; then
+        log "Missing dependency: $1"
+        exit 1
+    fi
+}
 
-echo "🚀 Installing dotfiles..."
+timestamp() {
+    date +"%Y%m%d%H%M%S"
+}
 
-# Check if dotfiles directory exists
-if [ ! -d "$DOTFILES_DIR" ]; then
-    echo "❌ Error: Dotfiles directory not found at $DOTFILES_DIR"
-    exit 1
-fi
+link_file() {
+    local source="$1"
+    local target="$2"
 
-# Git configuration
-echo "📦 Setting up Git aliases..."
-if git config --global include.path ~/dotfiles/git/.gitconfig-aliases; then
-    echo "✅ Git aliases configured"
-else
-    echo "❌ Failed to configure Git aliases"
-    exit 1
-fi
+    mkdir -p "$(dirname "$target")"
 
-echo ""
-echo "✨ Installation complete!"
-echo ""
-echo "Available Git aliases:"
-echo "  - git list-gone    : List branches with deleted remotes"
-echo "  - git prune-gone   : Delete branches with deleted remotes"
-echo "  - git lg           : Pretty commit log"
-echo "  - git recent       : Recent branches"
-echo "  - git undo         : Undo last commit (keep changes)"
-echo "  - git last         : Show last commit"
-echo "  - git amend        : Amend last commit"
-echo ""
-echo "Run 'git <alias>' to use them!"
+    if [ -L "$target" ]; then
+        if [ "$(readlink "$target")" = "$source" ]; then
+            log "Already linked: $target"
+            return
+        fi
+    fi
 
+    if [ -e "$target" ] || [ -L "$target" ]; then
+        local backup="${target}.backup.$(timestamp)"
+        mv "$target" "$backup"
+        log "Existing $(basename "$target") moved to $backup"
+    fi
+
+    ln -s "$source" "$target"
+    log "Linked $target -> $source"
+}
+
+has_include() {
+    local include="$1"
+    local includes
+    includes="$(git config --global --get-all include.path 2>/dev/null || true)"
+    grep -Fx "$include" <<<"$includes" >/dev/null 2>&1
+}
+
+ensure_include() {
+    local include="$1"
+    if has_include "$include"; then
+        log "Git already includes $include"
+    else
+        git config --global --add include.path "$include"
+        log "Added git include for $include"
+    fi
+}
+
+drop_include() {
+    local include="$1"
+    if has_include "$include"; then
+        git config --global --unset-all include.path "$include"
+        log "Removed git include for $include"
+    fi
+}
+
+configure_delta() {
+    local delta_config="$1"
+    if command -v delta >/dev/null 2>&1; then
+        ensure_include "$delta_config"
+        log "delta found; advanced diff pager enabled"
+    else
+        drop_include "$delta_config"
+        log "delta not found; skipped advanced diff pager"
+    fi
+}
+
+main() {
+    require_command git
+
+    local repo_root
+    repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+    log "Installing dotfiles from ${repo_root}"
+
+    local git_config="${repo_root}/git/.gitconfig"
+    local git_ignore="${repo_root}/git/.gitignore_global"
+    local git_message="${repo_root}/git/.gitmessage"
+    local delta_config="${repo_root}/git/.gitconfig.delta"
+
+    ensure_include "$git_config"
+    configure_delta "$delta_config"
+
+    link_file "$git_ignore" "$HOME/.gitignore_global"
+    link_file "$git_message" "$HOME/.gitmessage"
+
+    log "Dotfiles installation complete"
+    log "Update your name/email in ${git_config} if needed"
+}
+
+main "$@"

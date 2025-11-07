@@ -1,0 +1,45 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Icon?
+
+# Editors and tools
+*.swp
+*.swo
+*~
+*.orig
+.idea/
+.vscode/
+.fleet/
+__pycache__/
+
+# Logs and coverage
+*.log
+*.tmp
+*.out
+coverage/
+.nyc_output/
+
+# Dependencies
+node_modules/
+vendor/
+dist/
+target/
+.terraform/
+
+# Archives / binaries
+*.zip
+*.tar
+*.tgz
+*.gz
+*.7z
+*.dmg
+*.exe
+
+# Local overrides
+.env
+.env.local
+.env.*.local
+.DS_Store?
+.cache/
