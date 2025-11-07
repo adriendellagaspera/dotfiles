@@ -8,7 +8,7 @@ export ZSH_CONFIG_ROOT="$config_root"
 autoload -Uz add-zsh-hook colors vcs_info
 colors
 
-for module in path environment options completion aliases prompt plugins; do
+for module in path environment options completion aliases tools prompt plugins; do
 	typeset file="${config_root}/${module}.zsh"
 	[ -f "$file" ] && source "$file"
 done

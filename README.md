@@ -10,6 +10,7 @@ Portable Git-first dotfiles so your workflow feels the same on any machine (loca
 - Optional include that lights up [delta](https://github.com/dandavison/delta) as the pager whenever it is available (and automatically removed when it is not).
 - Idempotent installer that works from any checkout path, backs up existing dotfiles, and keeps your global Git config tidy.
 - First-class zsh setup with XDG-friendly layout (`~/.zshenv` + `~/.config/zsh`), ergonomic defaults (history, completion, prompt, aliases), and optional plugins (autosuggestions, syntax highlighting, completions, fzf) that auto-sync into `~/.local/share/zsh/plugins`.
+- Automatically adopts modern CLI helpers when they are installed: `eza` powers richer directory and tree views, while `zoxide` gives jump-to-anywhere directory navigation (with a handy `j` alias).
 
 ## Installation
 
@@ -33,7 +34,8 @@ Re-run the installer any time—you can keep tweaking the repo and immediately s
 1. Edit `git/.gitconfig` and set your `user.name` / `user.email` (the defaults are placeholders).
 2. Adjust the global ignore or commit template to match team conventions; because the files are symlinked into `$HOME`, all editors use the repo version.
 3. Install [`delta`](https://github.com/dandavison/delta) if you want side-by-side diffs; otherwise the standard pager is left untouched.
-4. Customize the zsh stack by editing files under `zsh/config/` (e.g., extend `aliases.zsh`, tweak `prompt.zsh`, or change the plugin list). You can also drop `.zsh` snippets into `~/.config/zsh/local/` for machine-specific overrides that stay out of git.
+4. Install [`eza`](https://github.com/eza-community/eza) for a faster, git-aware `ls`, and [`zoxide`](https://github.com/ajeetdsouza/zoxide) for AI-like `cd`—the shell config detects them automatically.
+5. Customize the zsh stack by editing files under `zsh/config/` (e.g., extend `aliases.zsh`, tweak `prompt.zsh`, or change the plugin list). You can also drop `.zsh` snippets into `~/.config/zsh/local/` for machine-specific overrides that stay out of git.
 
 ## Zsh highlights
 
@@ -43,6 +45,18 @@ Re-run the installer any time—you can keep tweaking the repo and immediately s
 - Prompt built on `vcs_info` shows branch, staged/unstaged markers, exit status, and a right-aligned clock.
 - Plugin manager keeps repositories under `${XDG_DATA_HOME:-~/.local/share}/zsh/plugins`; edit `zsh/config/plugins.list` to add/remove entries, then rerun `./install.sh` to sync.
 - If you are offline or behind a restrictive network policy, export `DOTFILES_SKIP_ZSH_PLUGINS=1` before running the installer to quiet plugin-clone warnings. Re-run without the flag once you regain access.
+- When `eza` is available the standard `ls`, `ll`, `la`, and `tree` aliases upgrade automatically (grouping directories first, showing git info, icons, etc.). When it is not, the regular `ls` aliases remain in place.
+- When `zoxide` is installed, it transparently extends `cd`/`z` history and exposes a `j <pattern>` shortcut for fuzzy directory jumps.
+
+## More CLI helpers (use cases)
+
+- **`fd`**: instant recursive file search with sensible defaults (respects `.gitignore`, color output). Perfect for narrowing down candidates before handing them to `fzf` or `rg`.
+- **`ripgrep` (`rg`)**: the fastest way to search huge codebases; integrates with editors (VS Code, Helix, Neovim Telescope) and honors ignore files by default.
+- **`bat`**: a drop-in `cat` replacement with syntax highlighting, git blame sidebar, and paging—fantastic for reviewing configs straight from the CLI.
+- **`direnv`**: keeps per-project environment variables (language toolchains, credentials, feature flags) in sync automatically as you `cd` around.
+- **`starship`**: asynchronous, git-aware prompt written in Rust; keeps shells snappy even in large repos and works across Bash, Zsh, Fish, etc.
+- **`fzf`**: terminal fuzzy finder you can combine with `git`, `rg`, or `fd` pipes for interactive selections (e.g., `git ls-files | fzf | xargs $EDITOR`).
+- **`dust`**: a modern `du` that visualizes disk usage in sorted, colored output—great for pruning large node_modules or build artifacts.
 - fzf integration auto-loads when `fzf` is installed (via the stock `~/.fzf.zsh` script), and autosuggestions gain a `<Ctrl-Space>` accept binding.
 
 ## Git aliases snapshot
