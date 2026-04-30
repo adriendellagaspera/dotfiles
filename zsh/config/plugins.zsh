@@ -33,7 +33,11 @@ done
 
 if command -v fzf >/dev/null 2>&1; then
 	if [ -f "$HOME/.fzf.zsh" ]; then
+		# Manual install via ~/.fzf/install
 		source "$HOME/.fzf.zsh"
+	else
+		# Package-manager install (fzf >= 0.48 ships --zsh for shell integration)
+		eval "$(fzf --zsh 2>/dev/null)" 2>/dev/null || true
 	fi
 fi
 

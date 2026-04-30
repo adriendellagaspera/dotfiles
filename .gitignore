@@ -9,6 +9,7 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Local customizations
+# Local customizations (machine-specific overrides, never committed)
 *.local
+zsh/config/local/
 

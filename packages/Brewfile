@@ -1,0 +1,18 @@
+# macOS packages — install with: brew bundle --file=packages/Brewfile
+# Core
+brew "git"
+brew "zsh"
+brew "neovim"
+
+# Modern CLI replacements (auto-detected by shell config)
+brew "bat"           # cat with syntax highlighting
+brew "eza"           # ls replacement (icons, git info)
+brew "fd"            # fast find
+brew "ripgrep"       # fast grep
+brew "dust"          # du with visual output
+brew "zoxide"        # smart cd
+brew "fzf"           # fuzzy finder
+brew "git-delta"     # side-by-side diffs (auto-enabled by installer)
+
+# Dev ergonomics
+brew "direnv"        # per-project env vars
