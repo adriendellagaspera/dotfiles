@@ -31,7 +31,8 @@ link_file() {
     fi
 
     if [ -e "$target" ] || [ -L "$target" ]; then
-        local backup="${target}.backup.$(timestamp)"
+        local backup
+        backup="${target}.backup.$(timestamp)"
         mv "$target" "$backup"
         log "Existing $(basename "$target") moved to $backup"
     fi
