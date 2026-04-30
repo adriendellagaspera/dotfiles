@@ -8,4 +8,7 @@ export GOPATH="${GOPATH:-$HOME/go}"
 export CARGO_HOME="${CARGO_HOME:-$HOME/.cargo}"
 export PNPM_HOME="${PNPM_HOME:-$HOME/.local/share/pnpm}"
 
-path=("$PNPM_HOME" "$GOPATH/bin" "$CARGO_HOME/bin" $path[@])
+# Only prepend tool paths when the directory actually exists
+[[ -d "$PNPM_HOME" ]]      && path=("$PNPM_HOME" $path[@])
+[[ -d "$GOPATH/bin" ]]     && path=("$GOPATH/bin" $path[@])
+[[ -d "$CARGO_HOME/bin" ]] && path=("$CARGO_HOME/bin" $path[@])

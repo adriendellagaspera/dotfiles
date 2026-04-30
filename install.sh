@@ -127,6 +127,10 @@ setup_zsh() {
             sync_zsh_plugins "$plugin_list"
         fi
     fi
+
+    local local_dir="${zsh_root}/config/local"
+    mkdir -p "$local_dir"
+    log "Local overrides directory ready: $local_dir (~/.config/zsh/local/)"
 }
 
 main() {

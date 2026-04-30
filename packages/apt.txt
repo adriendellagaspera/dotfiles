@@ -1,0 +1,17 @@
+# Debian/Ubuntu packages — install with: xargs sudo apt install -y < packages/apt.txt
+# Core
+git
+zsh
+neovim
+
+# Modern CLI replacements (auto-detected by shell config)
+bat
+fd-find
+ripgrep
+fzf
+direnv
+
+# Notes:
+# - eza and zoxide are not in standard apt repos; install from GitHub releases or cargo
+# - git-delta: install from https://github.com/dandavison/delta/releases
+# - dust: install via cargo (cargo install du-dust)
