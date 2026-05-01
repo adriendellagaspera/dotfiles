@@ -10,6 +10,8 @@
 	autocrlf = input
 	excludesFile = ~/.gitignore_global
 	pager = less -FX
+	fsmonitor = true
+	untrackedCache = true
 
 [color]
 	ui = auto
@@ -22,6 +24,7 @@
 
 [push]
 	autoSetupRemote = true
+	followTags = true
 
 [fetch]
 	prune = true
@@ -31,6 +34,7 @@
 
 [rebase]
 	autoStash = true
+	autoSquash = true
 
 [rerere]
 	enabled = true
@@ -45,6 +49,16 @@
 
 [commit]
 	template = ~/.gitmessage
+	verbose = true
+
+[branch]
+	sort = -committerdate
+
+[tag]
+	sort = version:refname
+
+[column]
+	ui = auto
 
 [help]
 	autocorrect = prompt

@@ -8,6 +8,9 @@
 	features = side-by-side line-numbers decorations
 	navigate = true
 	syntax-theme = OneHalfLight
+	hyperlinks = true
+	relative-paths = true
+	whitespace-error-style = reverse purple
 
 [delta "decorations"]
 	commit-decoration-style = bold yellow box

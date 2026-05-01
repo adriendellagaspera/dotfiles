@@ -29,3 +29,9 @@
 	blame = blame -w -C -C
 	tags = tag -l --sort=-taggerdate
 	shortstat = diff --shortstat "@{1}" HEAD
+
+	# --- Meta / sync -------------------------------------------------------
+	aliases = "!git config --get-regexp ^alias\\. | sed 's/alias\\.\\([^ ]*\\) /\\1\\t/'"
+	current = branch --show-current
+	sync = "!git fetch --prune && git rebase --autostash @{u}"
+	cleanup = "!git fetch --prune && git list-gone && git prune-merged"
