@@ -59,17 +59,6 @@ Re-run the installer any time—you can keep tweaking the repo and immediately s
 - **`dust`**: a modern `du` that visualizes disk usage in sorted, colored output—great for pruning large node_modules or build artifacts.
 - fzf integration auto-loads when `fzf` is installed (via the stock `~/.fzf.zsh` script), and autosuggestions gain a `<Ctrl-Space>` accept binding.
 
-## Git aliases snapshot
-
-| Alias | Description |
-| --- | --- |
-| `list-gone`, `prune-gone`, `prune-merged`, `recent` | Clean up dead branches and sort by activity. |
-| `lg`, `lga`, `ll`, `last`, `files` | Beautiful history browsers with relative dates and file summaries. |
-| `undo`, `uncommit`, `unstage`, `staged`, `amend`, `fixup`, `continue`, `wip`, `please` | Workflow accelerators for everyday Git chores. |
-| `coauthors`, `root`, `blame`, `tags`, `shortstat` | Inspection helpers for reviewing and composing commits. |
-
-Run `git config --global --get-regexp alias` to inspect the full list after installing.
-
 ## Repository Structure
 
 ```
@@ -88,3 +77,96 @@ dotfiles/
 ```
 
 Feel free to fork and tailor further—these files are intentionally small and easy to extend. Running `./install.sh` again will propagate any new additions.
+
+## Cheatsheet
+
+Quick reference for everything wired up across these dotfiles and the companion repo conventions.
+
+### Per-clone setup (any repo with `.pre-commit-config.yaml`)
+
+```bash
+pre-commit install                          # install standard hooks
+pre-commit install --hook-type commit-msg   # enforce Conventional Commits
+
+# Optional: use a repo-local commit template (e.g. financial-signal-monitor)
+git config --local commit.template .gitmessage
+```
+
+### Conventional Commits
+
+Format: `<type>(<scope>): <subject>`
+
+| Type | When to use |
+| --- | --- |
+| `feat` | A user-visible new feature |
+| `fix` | A bug fix |
+| `chore` | Tooling, deps, repo plumbing |
+| `docs` | Documentation only |
+| `refactor` | Code change with no behaviour change |
+| `test` | Adding/updating tests |
+| `ci` | CI configuration |
+| `build` | Build system / dependencies |
+| `perf` | Performance improvement |
+| `style` | Formatting, no code change |
+| `revert` | Revert a previous commit |
+
+Enforced by `commitizen` on public repos; soft-suggested via `.gitmessage` on private ones.
+
+### Git aliases
+
+List them anytime with `git aliases` (or `git help -a` for built-ins + aliases).
+
+| Alias | Purpose |
+| --- | --- |
+| **Branch hygiene** | |
+| `list-gone` | List local branches whose remote was deleted |
+| `prune-gone` | Force-delete branches whose remote was deleted |
+| `prune-merged` | Delete branches already merged into main/master/develop |
+| `recent` | List branches sorted by most recent commit |
+| **History views** | |
+| `lg` | Compact one-line graph log with colors and relative dates |
+| `lga` | Full graph log with all branches and stats |
+| `ll` | Last 20 commits, one line each |
+| `last` | Last commit with stat |
+| `files` | List files changed in a diff |
+| **Workflow** | |
+| `undo` | Soft-reset HEAD^ (changes stay staged) |
+| `uncommit` | Mixed-reset HEAD^ (changes unstaged) |
+| `unstage` | Unstage specific paths |
+| `staged` | Diff of staged changes |
+| `amend` | Amend last commit, keeping its message |
+| `fixup` | Create `fixup!` commit pointing at HEAD (auto-squashed by next rebase) |
+| `continue` | `git rebase --continue` |
+| `wip` | Stage everything and commit "WIP" (skips hooks) |
+| `please` | `git push --force-with-lease` (safe force-push) |
+| **Inspection** | |
+| `coauthors <name> <email>` | Append `Co-authored-by` to the pending commit |
+| `root` | Print the repo root path |
+| `blame` | Smarter blame (`-w -C -C`) |
+| `tags` | List tags by tag-date desc |
+| `shortstat` | Stat diff between previous HEAD and current |
+| **Meta / sync** | |
+| `aliases` | List all configured aliases (name + command) |
+| `current` | Print the current branch name |
+| `sync` | `fetch --prune` + `rebase --autostash` against upstream |
+| `cleanup` | `fetch --prune` + show gone branches + delete merged ones |
+
+### `.gitconfig` defaults worth knowing
+
+| Setting | Effect |
+| --- | --- |
+| `commit.verbose = true` | Diff shown in commit editor — helps you write better messages |
+| `rebase.autoSquash = true` | `fixup!` / `squash!` commits auto-squash on `rebase -i` |
+| `branch.sort = -committerdate` | `git branch` lists most recent first |
+| `tag.sort = version:refname` | `git tag` sorted semver-wise (v1.10 > v1.9) |
+| `push.followTags = true` | `git push` carries annotated tags along |
+| `push.autoSetupRemote = true` | First push of a new branch needs no `-u` |
+| `pull.ff = only` | Refuses non-FF pulls (no surprise merges) |
+| `merge.conflictstyle = zdiff3` | Conflict markers include the common ancestor |
+| `rebase.autoStash = true` | `git rebase` stashes/unstashes dirty work for you |
+| `rerere.enabled = true` | Reuses recorded conflict resolutions |
+| `diff.algorithm = histogram` | Smarter diffs, especially for code moves |
+| `column.ui = auto` | Multi-column branch/tag listings |
+| `core.fsmonitor = true` | Filesystem monitor for fast `status` (Git ≥ 2.37) |
+| `core.untrackedCache = true` | Caches untracked file scan |
+| `help.autocorrect = prompt` | Confirms before running a corrected typo |

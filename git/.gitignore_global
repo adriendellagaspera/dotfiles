@@ -43,3 +43,12 @@ target/
 .env.*.local
 .DS_Store?
 .cache/
+
+# Python / data science caches
+.ipynb_checkpoints/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# direnv
+.direnv/
