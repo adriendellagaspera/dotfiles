@@ -10,7 +10,7 @@ jobs:
     name: shellcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run shellcheck on install.sh
         run: shellcheck install.sh
 
@@ -18,7 +18,7 @@ jobs:
     name: Install smoke test (Ubuntu)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run installer
         run: DOTFILES_SKIP_ZSH_PLUGINS=1 bash install.sh
       - name: Verify symlinks exist
