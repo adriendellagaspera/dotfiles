@@ -1,172 +1,25 @@
 # Dotfiles
 
-Portable Git-first dotfiles so your workflow feels the same on any machine (local, CI runners, or disposable containers).
+Git and zsh configuration for local machines and disposable environments.
 
-## Features
+## Install
 
-- Modular Git config (`git/.gitconfig`) with sane defaults (pruned fetches, `main` default branch, `zdiff3` conflicts, rerere, histogram diffs, commit template, short status).
-- Rich alias pack grouped by task (branch hygiene, log views, workflow helpers, inspection tools) in `git/.gitconfig-aliases`.
-- Opinionated global ignore file plus a commit message template that are symlinked into `$HOME` so edits follow the repo.
-- Optional include that lights up [delta](https://github.com/dandavison/delta) as the pager whenever it is available (and automatically removed when it is not).
-- Idempotent installer that works from any checkout path, backs up existing dotfiles, and keeps your global Git config tidy.
-- First-class zsh setup with XDG-friendly layout (`~/.zshenv` + `~/.config/zsh`), ergonomic defaults (history, completion, prompt, aliases), and optional plugins (autosuggestions, syntax highlighting, completions, fzf) that auto-sync into `~/.local/share/zsh/plugins`.
-- Automatically adopts modern CLI helpers when they are installed: `eza` powers richer directory and tree views, while `zoxide` gives jump-to-anywhere directory navigation (with a handy `j` alias).
-
-## Installation
-
-```bash
+```sh
 ./install.sh
 ```
 
-The script:
+The installer adds `git/.gitconfig` to the global Git configuration, links the
+global ignore file and commit template, and links `zsh/.zshenv` and `zsh/config`
+into the home directory. Existing files at those paths are backed up with a
+timestamp. Re-running the installer updates the links and optional zsh plugins.
 
-1. Detects the repository path automatically, so you can run it from any clone (even inside containers).
-2. Adds the Git include(s) only once and keeps them up to date.
-3. Symlinks `git/.gitignore_global` → `~/.gitignore_global` and `git/.gitmessage` → `~/.gitmessage`, backing up any existing files as `*.backup.<timestamp>`.
-4. Links `zsh/.zshenv` → `~/.zshenv` and `zsh/config` → `~/.config/zsh`, keeping everything XDG-aligned.
-5. Enables the delta config when `delta` is installed, and removes it when it is missing so `git diff` never breaks.
-6. Optionally clones/updates the zsh plugins defined in `zsh/config/plugins.list` whenever `zsh` is present (set `DOTFILES_SKIP_ZSH_PLUGINS=1` to opt out—handy on restricted networks).
+Edit `git/.gitconfig` to set your Git name and email. The defaults are
+placeholders. Local zsh overrides belong in `zsh/config/local/`, which is
+excluded from Git.
 
-Re-run the installer any time—you can keep tweaking the repo and immediately sync the changes onto the host/container.
+If `delta` is installed, the installer includes `git/.gitconfig.delta`; otherwise
+it removes that include. If `zsh` is installed, it syncs plugins listed in
+`zsh/config/plugins.list`. Set `DOTFILES_SKIP_ZSH_PLUGINS=1` to skip that step.
 
-## Customize
-
-1. Edit `git/.gitconfig` and set your `user.name` / `user.email` (the defaults are placeholders).
-2. Adjust the global ignore or commit template to match team conventions; because the files are symlinked into `$HOME`, all editors use the repo version.
-3. Install [`delta`](https://github.com/dandavison/delta) if you want side-by-side diffs; otherwise the standard pager is left untouched.
-4. Install [`eza`](https://github.com/eza-community/eza) for a faster, git-aware `ls`, and [`zoxide`](https://github.com/ajeetdsouza/zoxide) for AI-like `cd`—the shell config detects them automatically.
-5. Customize the zsh stack by editing files under `zsh/config/` (e.g., extend `aliases.zsh`, tweak `prompt.zsh`, or change the plugin list). You can also drop `.zsh` snippets into `~/.config/zsh/local/` for machine-specific overrides that stay out of git.
-
-## Zsh highlights
-
-- `.zshenv` keeps `$ZDOTDIR` and `$DOTFILES_ROOT` consistent everywhere (interactive shells, scripts, login shells).
-- `~/.config/zsh/.zshrc` sources modular files for path/env setup, shell options, completions, aliases, prompt, and plugins.
-- History lives under `${XDG_STATE_HOME:-~/.local/state}/zsh/history`, giving you 200k entries with `history-beginning-search` keybindings.
-- Prompt built on `vcs_info` shows branch, staged/unstaged markers, exit status, and a right-aligned clock.
-- Plugin manager keeps repositories under `${XDG_DATA_HOME:-~/.local/share}/zsh/plugins`; edit `zsh/config/plugins.list` to add/remove entries, then rerun `./install.sh` to sync.
-- If you are offline or behind a restrictive network policy, export `DOTFILES_SKIP_ZSH_PLUGINS=1` before running the installer to quiet plugin-clone warnings. Re-run without the flag once you regain access.
-- When `eza` is available the standard `ls`, `ll`, `la`, and `tree` aliases upgrade automatically (grouping directories first, showing git info, icons, etc.). When it is not, the regular `ls` aliases remain in place.
-- When `zoxide` is installed, it transparently extends `cd`/`z` history and exposes a `j <pattern>` shortcut for fuzzy directory jumps.
-
-## More CLI helpers (use cases)
-
-- **`fd`**: instant recursive file search with sensible defaults (respects `.gitignore`, color output). Perfect for narrowing down candidates before handing them to `fzf` or `rg`.
-- **`ripgrep` (`rg`)**: the fastest way to search huge codebases; integrates with editors (VS Code, Helix, Neovim Telescope) and honors ignore files by default.
-- **`bat`**: a drop-in `cat` replacement with syntax highlighting, git blame sidebar, and paging—fantastic for reviewing configs straight from the CLI.
-- **`direnv`**: keeps per-project environment variables (language toolchains, credentials, feature flags) in sync automatically as you `cd` around.
-- **`starship`**: asynchronous, git-aware prompt written in Rust; keeps shells snappy even in large repos and works across Bash, Zsh, Fish, etc.
-- **`fzf`**: terminal fuzzy finder you can combine with `git`, `rg`, or `fd` pipes for interactive selections (e.g., `git ls-files | fzf | xargs $EDITOR`).
-- **`dust`**: a modern `du` that visualizes disk usage in sorted, colored output—great for pruning large node_modules or build artifacts.
-- fzf integration auto-loads when `fzf` is installed (via the stock `~/.fzf.zsh` script), and autosuggestions gain a `<Ctrl-Space>` accept binding.
-
-## Repository Structure
-
-```
-dotfiles/
-├── git/
-│   ├── .gitconfig            # Core Git defaults (includes aliases)
-│   ├── .gitconfig-aliases    # Alias definitions grouped by workflow
-│   ├── .gitconfig.delta      # Optional delta-specific tuning
-│   ├── .gitignore_global     # Global ignore patterns
-│   └── .gitmessage           # Conventional commits template
-├── zsh/
-│   ├── .zshenv               # Sets DOTFILES + XDG-aware ZDOTDIR
-│   └── config/               # Modular zsh config (rc, aliases, prompt, plugins)
-├── install.sh                # Idempotent installer / bootstrapper
-└── README.md                 # This file
-```
-
-Feel free to fork and tailor further—these files are intentionally small and easy to extend. Running `./install.sh` again will propagate any new additions.
-
-## Cheatsheet
-
-Quick reference for everything wired up across these dotfiles and the companion repo conventions.
-
-### Per-clone setup (any repo with `.pre-commit-config.yaml`)
-
-```bash
-pre-commit install                          # install standard hooks
-pre-commit install --hook-type commit-msg   # enforce Conventional Commits
-
-# Optional: use a repo-local commit template (e.g. financial-signal-monitor)
-git config --local commit.template .gitmessage
-```
-
-### Conventional Commits
-
-Format: `<type>(<scope>): <subject>`
-
-| Type | When to use |
-| --- | --- |
-| `feat` | A user-visible new feature |
-| `fix` | A bug fix |
-| `chore` | Tooling, deps, repo plumbing |
-| `docs` | Documentation only |
-| `refactor` | Code change with no behaviour change |
-| `test` | Adding/updating tests |
-| `ci` | CI configuration |
-| `build` | Build system / dependencies |
-| `perf` | Performance improvement |
-| `style` | Formatting, no code change |
-| `revert` | Revert a previous commit |
-
-Enforced by `commitizen` on public repos; soft-suggested via `.gitmessage` on private ones.
-
-### Git aliases
-
-List them anytime with `git aliases` (or `git help -a` for built-ins + aliases).
-
-| Alias | Purpose |
-| --- | --- |
-| **Branch hygiene** | |
-| `list-gone` | List local branches whose remote was deleted |
-| `prune-gone` | Force-delete branches whose remote was deleted |
-| `prune-merged` | Delete branches already merged into main/master/develop |
-| `recent` | List branches sorted by most recent commit |
-| **History views** | |
-| `lg` | Compact one-line graph log with colors and relative dates |
-| `lga` | Full graph log with all branches and stats |
-| `ll` | Last 20 commits, one line each |
-| `last` | Last commit with stat |
-| `files` | List files changed in a diff |
-| **Workflow** | |
-| `undo` | Soft-reset HEAD^ (changes stay staged) |
-| `uncommit` | Mixed-reset HEAD^ (changes unstaged) |
-| `unstage` | Unstage specific paths |
-| `staged` | Diff of staged changes |
-| `amend` | Amend last commit, keeping its message |
-| `fixup` | Create `fixup!` commit pointing at HEAD (auto-squashed by next rebase) |
-| `continue` | `git rebase --continue` |
-| `wip` | Stage everything and commit "WIP" (skips hooks) |
-| `please` | `git push --force-with-lease` (safe force-push) |
-| **Inspection** | |
-| `coauthors <name> <email>` | Append `Co-authored-by` to the pending commit |
-| `root` | Print the repo root path |
-| `blame` | Smarter blame (`-w -C -C`) |
-| `tags` | List tags by tag-date desc |
-| `shortstat` | Stat diff between previous HEAD and current |
-| **Meta / sync** | |
-| `aliases` | List all configured aliases (name + command) |
-| `current` | Print the current branch name |
-| `sync` | `fetch --prune` + `rebase --autostash` against upstream |
-| `cleanup` | `fetch --prune` + show gone branches + delete merged ones |
-
-### `.gitconfig` defaults worth knowing
-
-| Setting | Effect |
-| --- | --- |
-| `commit.verbose = true` | Diff shown in commit editor — helps you write better messages |
-| `rebase.autoSquash = true` | `fixup!` / `squash!` commits auto-squash on `rebase -i` |
-| `branch.sort = -committerdate` | `git branch` lists most recent first |
-| `tag.sort = version:refname` | `git tag` sorted semver-wise (v1.10 > v1.9) |
-| `push.followTags = true` | `git push` carries annotated tags along |
-| `push.autoSetupRemote = true` | First push of a new branch needs no `-u` |
-| `pull.ff = only` | Refuses non-FF pulls (no surprise merges) |
-| `merge.conflictstyle = zdiff3` | Conflict markers include the common ancestor |
-| `rebase.autoStash = true` | `git rebase` stashes/unstashes dirty work for you |
-| `rerere.enabled = true` | Reuses recorded conflict resolutions |
-| `diff.algorithm = histogram` | Smarter diffs, especially for code moves |
-| `column.ui = auto` | Multi-column branch/tag listings |
-| `core.fsmonitor = true` | Filesystem monitor for fast `status` (Git ≥ 2.37) |
-| `core.untrackedCache = true` | Caches untracked file scan |
-| `help.autocorrect = prompt` | Confirms before running a corrected typo |
+Configuration lives in `git/` and `zsh/config/`; inspect those files for the
+current aliases and shell behavior. Optional package lists are in `packages/`.
