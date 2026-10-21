@@ -1,0 +1,48 @@
+# macOS-style command-line navigation
+
+# Move by word using dedicated escape sequences
+keybind = alt+left=csi:1;3D
+keybind = alt+right=csi:1;3C
+
+# Move to the beginning or end of the command
+keybind = super+left=text:\x01
+keybind = super+right=text:\x05
+
+# Delete the previous word or everything before the cursor
+keybind = alt+backspace=text:\x17
+keybind = super+backspace=text:\x15
+
+# Extend selection by character
+keybind = shift+left=csi:1;2D
+keybind = shift+right=csi:1;2C
+
+# Extend selection by word
+keybind = alt+shift+left=csi:1;4D
+keybind = alt+shift+right=csi:1;4C
+
+# Extend selection to buffer boundaries
+keybind = super+shift+left=csi:1;10D
+keybind = super+shift+right=csi:1;10C
+
+# Select the entire editable command
+keybind = super+a=csi:97;9u
+
+# Disable directory navigation shortcuts
+keybind = alt+up=ignore
+keybind = alt+down=ignore
+
+# Command-line clipboard operations
+keybind = super+c=csi:99;9u
+keybind = super+x=csi:120;9u
+
+# Preserve native clipboard paste, including bracketed paste
+keybind = super+v=paste_from_clipboard
+
+# Copy terminal output explicitly
+keybind = super+shift+c=copy_to_clipboard
+
+# Copy mouse-selected terminal text to the macOS clipboard
+copy-on-select = clipboard
+
+# Keep terminal selections visible after copying.
+selection-clear-on-copy = false
