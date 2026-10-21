@@ -134,6 +134,16 @@ setup_zsh() {
     log "Local overrides directory ready: $local_dir (~/.config/zsh/local/)"
 }
 
+setup_ghostty() {
+    local repo_root="$1"
+
+    # Use the native macOS location, matching the working Ghostty configuration.
+    if [ "$(uname -s)" = "Darwin" ]; then
+        link_file "${repo_root}/ghostty/config.ghostty" \
+            "$HOME/Library/Application Support/com.mitchellh.ghostty/config.ghostty"
+    fi
+}
+
 main() {
     require_command git
 
@@ -154,6 +164,7 @@ main() {
     link_file "$git_message" "$HOME/.gitmessage"
 
     setup_zsh "$repo_root"
+    setup_ghostty "$repo_root"
 
     log "Dotfiles installation complete"
     log "Update your name/email in ${git_config} if needed"

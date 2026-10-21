@@ -13,6 +13,11 @@ for module in path environment options completion aliases tools prompt plugins; 
 	[ -f "$file" ] && source "$file"
 done
 
+# macOS clipboard and Ghostty command-line selection.
+if [[ "$OSTYPE" == darwin* ]]; then
+	source "${config_root}/selection.zsh"
+fi
+
 # Load any optional overrides placed in ~/.config/zsh/local/*.zsh
 typeset local_dir="${config_root}/local"
 if [ -d "$local_dir" ]; then
