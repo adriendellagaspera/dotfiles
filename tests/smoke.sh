@@ -10,6 +10,7 @@ mkdir -p "$HOME"
 git config --global user.name 'Existing User'
 git config --global user.email existing@example.com
 for iteration in 1 2; do
+  printf 'Apply %s\n' "$iteration"
   bash "$repo_root/install.sh"
   test "$(git config --global user.name)" = 'Existing User'
   test "$(git config --global user.email)" = existing@example.com
@@ -49,6 +50,6 @@ bash "$repo_root/scripts/migrate-legacy.sh" "$legacy_root"
 test ! -L "$HOME/.config/zsh"
 test "$(cat "$HOME/.config/zsh/local/keep.zsh")" = 'local override'
 if git config --global --get-all include.path | grep -F "$legacy_root"; then exit 1; fi
-bash "$repo_root/install.sh"
+bash "$repo_root/install.sh" --force
 test -f "$HOME/.config/zsh/.zshrc"
 test -f "$HOME/.config/zsh/local/keep.zsh"

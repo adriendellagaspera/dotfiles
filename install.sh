@@ -8,6 +8,8 @@ if ! command -v chezmoi >/dev/null 2>&1; then
   trap 'rm -f "$installer"' EXIT
   curl --fail --silent --show-error --location https://get.chezmoi.io -o "$installer"
   sh "$installer" -b "$HOME/.local/bin"
+  rm -f "$installer"
+  trap - EXIT
   export PATH="$HOME/.local/bin:$PATH"
 fi
 exec chezmoi --source "$repo_root" apply "$@"
