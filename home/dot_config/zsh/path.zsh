@@ -12,12 +12,11 @@ fi
 path=(
 	"$HOME/.local/bin"
 	"$HOME/bin"
-	"$DOTFILES_ROOT/bin"
 	$path[@]
 )
 
-if [ -d "$DOTFILES_ROOT/zsh/functions" ]; then
-	fpath=("$DOTFILES_ROOT/zsh/functions" $fpath[@])
+if [ -d "$ZSH_CONFIG_ROOT/functions" ]; then
+	fpath=("$ZSH_CONFIG_ROOT/functions" $fpath[@])
 fi
 
 export PATH

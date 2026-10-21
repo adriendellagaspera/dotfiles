@@ -1,9 +1,5 @@
 [include]
-	path = .gitconfig-aliases
-
-[user]
-	name = Your Name
-	email = your@email.com
+	path = gitconfig-aliases
 
 [core]
 	editor = nvim

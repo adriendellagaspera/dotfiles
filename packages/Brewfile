@@ -16,3 +16,4 @@ brew "git-delta"     # side-by-side diffs (auto-enabled by installer)
 
 # Dev ergonomics
 brew "direnv"        # per-project env vars
+brew "chezmoi"

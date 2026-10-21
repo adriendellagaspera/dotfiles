@@ -13,3 +13,4 @@ Thumbs.db
 *.local
 zsh/config/local/
 
+home/dot_config/zsh/local/
